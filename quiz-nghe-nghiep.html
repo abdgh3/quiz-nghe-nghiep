@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Sở Thích Nghề Nghiệp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin: 10px 0;
+        }
+
+        .options button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .options button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background-color: #e7f5e7;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trắc Nghiệm Nghề Nghiệp</h1>
+        <div class="question-container">
+            <div class="question" id="question">Câu hỏi sẽ xuất hiện ở đây.</div>
+            <ul class="options" id="options">
+                <!-- Các lựa chọn sẽ xuất hiện ở đây -->
+            </ul>
+        </div>
+        <div class="result" id="result">
+            <h2>Kết quả của bạn</h2>
+            <p id="result-text"></p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Bạn thích làm việc với:",
+                options: ["Con người", "Máy móc", "Sáng tạo và nghệ thuật", "Dữ liệu và phân tích"],
+                result: {
+                    "Con người": "Bạn có thể làm việc trong lĩnh vực giáo dục, tư vấn hoặc chăm sóc sức khỏe.",
+                    "Máy móc": "Bạn có thể theo đuổi nghề kỹ thuật, cơ khí hoặc lập trình.",
+                    "Sáng tạo và nghệ thuật": "Bạn có thể trở thành một nghệ sĩ, nhà thiết kế đồ họa hoặc chuyên gia sáng tạo.",
+                    "Dữ liệu và phân tích": "Bạn có thể làm việc trong ngành công nghệ thông tin, nghiên cứu dữ liệu hoặc tài chính."
+                }
+            },
+            {
+                question: "Bạn cảm thấy hứng thú với công việc đòi hỏi:",
+                options: ["Sự giao tiếp và kết nối", "Giải quyết vấn đề kỹ thuật", "Tạo ra những sản phẩm sáng tạo", "Làm việc với con số và dữ liệu"],
+                result: {
+                    "Sự giao tiếp và kết nối": "Bạn có thể làm việc trong các lĩnh vực như quản lý, bán hàng hoặc tư vấn.",
+                    "Giải quyết vấn đề kỹ thuật": "Ngành kỹ thuật, lập trình hoặc thiết kế hệ thống có thể phù hợp với bạn.",
+                    "Tạo ra những sản phẩm sáng tạo": "Ngành nghệ thuật, thiết kế đồ họa hoặc truyền thông là những lựa chọn tuyệt vời.",
+                    "Làm việc với con số và dữ liệu": "Bạn có thể làm việc trong lĩnh vực tài chính, phân tích dữ liệu hoặc nghiên cứu thị trường."
+                }
+            },
+            {
+                question: "Bạn thích làm việc trong môi trường:",
+                options: ["Động, có sự thay đổi", "Ổn định và có kế hoạch", "Tự do, sáng tạo", "Cần sự tập trung cao vào chi tiết"],
+                result: {
+                    "Động, có sự thay đổi": "Bạn có thể làm việc trong các ngành nghề truyền thông, tổ chức sự kiện hoặc du lịch.",
+                    "Ổn định và có kế hoạch": "Công việc văn phòng hoặc quản lý dự án có thể là lựa chọn phù hợp với bạn.",
+                    "Tự do, sáng tạo": "Lĩnh vực nghệ thuật, thiết kế hoặc viết lách có thể giúp bạn phát huy tối đa khả năng sáng tạo.",
+                    "Cần sự tập trung cao vào chi tiết": "Bạn có thể làm việc trong các ngành như kế toán, kiểm toán, hoặc kỹ thuật phần mềm."
+                }
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedAnswers = [];
+
+        function loadQuestion() {
+            if (currentQuestion < questions.length) {
+                const questionObj = questions[currentQuestion];
+                document.getElementById("question").textContent = questionObj.question;
+                const optionsList = document.getElementById("options");
+                optionsList.innerHTML = ""; // Clear previous options
+                questionObj.options.forEach(option => {
+                    const button = document.createElement("button");
+                    button.textContent = option;
+                    button.onclick = () => handleAnswer(option);
+                    const listItem = document.createElement("li");
+                    listItem.appendChild(button);
+                    optionsList.appendChild(listItem);
+                });
+            } else {
+                showResult();
+            }
+        }
+
+        function handleAnswer(answer) {
+            selectedAnswers.push(answer);
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function showResult() {
+            let resultText = "Dựa trên các câu trả lời của bạn, chúng tôi khuyến nghị một số ngành nghề phù hợp với sở thích của bạn:<br>";
+            selectedAnswers.forEach(answer => {
+                questions.forEach(question => {
+                    if (question.options.includes(answer)) {
+                        resultText += question.result[answer] + "<br>";
+                    }
+                });
+            });
+            document.getElementById("result-text").innerHTML = resultText;
+            document.getElementById("result").style.display = "block";
+            document.querySelector(".question-container").style.display = "none";
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
